@@ -96,6 +96,7 @@ body.m #note{position:fixed;left:8px;right:8px;top:calc(8px + env(safe-area-inse
 .stage.tall .crew{font-size:19px;gap:2px 16px}
 .stage.tall .foot{font-size:12px}
 .stage.tall .foot span:first-child{display:none}
+.stage.maponly .panel,.stage.maponly .mapfade{display:none}
 .stage.nocrew .crew .cm-c{display:none}
 .stage.nocar .crew .cm-d{display:none}
 @media (prefers-reduced-motion: reduce){.ripple{display:none}}
@@ -597,6 +598,7 @@ body.m #note{position:fixed;left:8px;right:8px;top:calc(8px + env(safe-area-inse
  <button id="play" type="button">再生</button>
  <select id="speed" aria-label="再生の速さ"><option value="1">1秒＝1分</option><option value="3">1秒＝3分</option><option value="5" selected>1秒＝5分</option><option value="10">1秒＝10分</option></select>
  <div class="sl"><span>6:00</span><input id="t" type="range" min="360" max="1170" step="1" value="360" aria-label="時刻"><span>19:30</span></div>
+ <button id="maponly" type="button">地図だけ</button>
  <button id="live" type="button">いまの時刻<span class="lg">（当日用）</span></button>
  <select id="follow" aria-label="地図の範囲"><option value="">地図：全体</option><option>伊和</option><option>東市場</option><option>須行名</option><option>安黒</option><option>嶋田</option></select>
  <label><input id="crewon" type="checkbox" checked> カメラマン</label>
@@ -661,6 +663,7 @@ const kuraEls=D.kura.map(k=>{const g=el('g',{},gKura);el('rect',{x:-8,y:-8,width
   const t=el('text',{x:0,y:-14,'text-anchor':'middle','font-size':14,'font-weight':700,fill:D.col[k.who],'paint-order':'stroke',stroke:'#0E1726','stroke-width':4,'font-family':'Zen Kaku Gothic New, sans-serif'},g);t.textContent=k.who+' 蔵';return [g,k]});
 // 方位と縮尺
 const north=el('g',{transform:'translate(640,60)'},gDeco);
+const mclk=el('text',{x:24,y:62,'font-size':52,'font-weight':700,fill:'#F2EEE4','paint-order':'stroke',stroke:'#0E1726','stroke-width':6,'font-family':'Barlow Condensed, DIN Condensed, sans-serif',visibility:'hidden'},gDeco);
 el('path',{d:'M0,-22 L9,8 L0,2 L-9,8 Z',fill:'#F2EEE4'},north);
 const nT=el('text',{x:0,y:30,'text-anchor':'middle','font-size':18,'font-weight':900,fill:'#F2EEE4','font-family':'Barlow Condensed, sans-serif'},north);nT.textContent='N';
 const scale=el('g',{transform:'translate(36,1036)'},gDeco);
@@ -712,7 +715,7 @@ let T=360, crewOn=true, carOn=true;
 function draw(){
   // 範囲をなめらかに寄せる
   const tg=target(T);vb.cx+=(tg.cx-vb.cx)*.12;vb.cy+=(tg.cy-vb.cy)*.12;vb.h+=(tg.h-vb.h)*.12;applyVB();
-  $('clock').firstChild.nodeValue=hm(T);$('t').value=Math.round(T);
+  $('clock').firstChild.nodeValue=hm(T);mclk.textContent=hm(T);mclk.setAttribute('visibility',mapOnly?'visible':'hidden');$('t').value=Math.round(T);
   // 道すじ
   for(const k of YK){
     const a=[],b=[];for(let t=D.t0;t<=T;t+=1){const p=at(k,t);if(!p){a.push(null);continue}(t>T-25?b:a).push(p)}
@@ -779,11 +782,14 @@ const vp=$('vp'),stage=$('stage');
 const mapbox=document.querySelector('.mapbox'), panel=document.querySelector('.panel'), ctrl=$('ctrlbar');
 const MSW=780, PH=560;   // スマホ：画面の幅（設計上の大きさ）と、下の一覧の高さ
 let curSH=0;
+let mapOnly=false, curMO=false;   // 地図だけ：下（右）の表示を消して地図を画面いっぱいに出す
 function setTall(v,SH){
-  tall=v;curSH=SH;vp.classList.toggle('tall',v);stage.classList.toggle('tall',v);
-  if(v){W=MSW;H=SH-PH;stage.style.width=MSW+'px';stage.style.height=SH+'px';mapbox.style.width=MSW+'px';mapbox.style.height=H+'px';panel.style.top=H+'px';panel.style.height=PH+'px'}
-  else{W=700;H=1080;for(const e of [stage,mapbox,panel]){e.style.width='';e.style.height=''}panel.style.top=''}
-  AR=W/H;FULL=v?{cx:142,cy:240,h:Math.max(440,212/AR)}:FULL_W;vb={...target(T)};
+  tall=v;curSH=SH;curMO=mapOnly;vp.classList.toggle('tall',v);stage.classList.toggle('tall',v);stage.classList.toggle('maponly',mapOnly);
+  const ph=mapOnly?0:PH;
+  if(v){W=MSW;H=SH-ph;stage.style.width=MSW+'px';stage.style.height=SH+'px';mapbox.style.width=MSW+'px';mapbox.style.height=H+'px';panel.style.top=H+'px';panel.style.height=PH+'px'}
+  else{for(const e of [stage,mapbox,panel]){e.style.width='';e.style.height=''}panel.style.top='';
+    if(mapOnly){W=1920;H=1080;mapbox.style.width='1920px'}else{W=700;H=1080}}
+  AR=W/H;FULL=(v||mapOnly)?{cx:142,cy:240,h:Math.max(440,212/AR)}:FULL_W;vb={...target(T)};
   ov.setAttribute('viewBox',`0 0 ${W} ${H}`);north.setAttribute('transform',`translate(${W-46},56)`);scale.setAttribute('transform',`translate(28,${H-30})`);
 }
 function fit(){
@@ -792,7 +798,7 @@ function fit(){
   if(vp.style.height)vp.style.height='';   // スマホでは縦の並べ方（flex）で高さが決まる
   const r=vp.getBoundingClientRect();
   const SH=want?Math.round(MSW*r.height/r.width):1080;
-  if(want!==tall||(want&&SH!==curSH))setTall(want,SH);
+  if(want!==tall||(want&&SH!==curSH)||mapOnly!==curMO)setTall(want,SH);
   const SW=tall?MSW:1920,SHH=tall?SH:1080;
   const s=Math.min(r.width/SW,r.height/SHH);
   stage.style.transform=`translate(${(r.width-SW*s)/2}px,${(r.height-SHH*s)/2}px) scale(${s})`}
@@ -817,6 +823,7 @@ function setLive(v){live=v;$('live').classList.toggle('on',v);$('clk2').textCont
   else $('note').textContent=''}
 $('play').onclick=()=>{if(T>=1170)T=360;setPlay(!playing)};
 $('live').onclick=()=>setLive(!live);
+$('maponly').onclick=()=>{mapOnly=!mapOnly;$('maponly').classList.toggle('on',mapOnly);$('maponly').textContent=mapOnly?'表示を戻す':'地図だけ';fit()};
 $('t').oninput=e=>{setLive(false);setPlay(false);T=Number(e.target.value)};
 $('follow').onchange=e=>{follow=e.target.value};
 $('crewon').onchange=e=>{crewOn=e.target.checked;stage.classList.toggle('nocrew',!crewOn)};
