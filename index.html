@@ -1,5 +1,4 @@
-<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><style>[hidden]{display:none!important}html,body{margin:0}</style></head><body>
-<title>伊和神社 屋台の動き</title>
+<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="屋台の動き"><style>[hidden]{display:none!important}html,body{margin:0}</style></head><body><title>伊和神社 屋台の動き</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@500;700;900&family=Shippori+Mincho+B1:wght@800&family=Barlow+Condensed:wght@600;700&display=swap">
@@ -63,30 +62,35 @@ body{background:var(--page);color:var(--ink);font-family:var(--f-body);margin:0}
 .crew i{display:inline-block;width:12px;height:12px;border-radius:2px;margin-right:8px;vertical-align:1px}
 .foot{font-size:18px;color:#6C7A90;letter-spacing:.06em;display:flex;justify-content:space-between;gap:20px}
 .stage.nocrew.nocar .crew{display:none}
-/* ---- スマホ（幅が狭いとき）は縦長：上に地図、下に時計と一覧 ---- */
-.viewport.tall{aspect-ratio:9/16}
-.stage.tall{width:1080px;height:1920px}
-.stage.tall .mapbox{width:1080px;height:1120px}
+/* ---- スマホ（幅が狭いとき）：1画面に収める。上に大きな地図、下に時計・いま・一覧、いちばん下に操作 ---- */
+body.m .wrap{padding:0;gap:0;max-width:none}
+body.m .viewport{border-radius:0;aspect-ratio:auto}
+body.m .ctrl{border-radius:0;border-width:1px 0 0;padding:6px 10px calc(6px + env(safe-area-inset-bottom,0px));gap:8px;flex-wrap:nowrap}
+body.m #speed,body.m #follow,body.m .ctrl label,body.m #fs,body.m .help,body.m .sl span,body.m .lg{display:none}
+body.m .ctrl button{padding:.45rem .7rem;font-size:.9rem;white-space:nowrap}
+body.m #note{position:fixed;left:8px;right:8px;top:8px;z-index:5;background:var(--btn);border:1px solid var(--line);border-radius:6px;padding:6px 8px}
 .stage.tall .mapfade{display:none}
-.stage.tall .panel{left:0;top:1120px;width:1080px;height:800px;padding:28px 44px 24px;gap:12px}
-.stage.tall .head{padding-bottom:14px}
-.stage.tall .head .kicker{font-size:22px}
-.stage.tall .head h1{font-size:50px}
-.stage.tall .head .date{font-size:21px}
-.stage.tall .clock{font-size:132px}
-.stage.tall .clock small{font-size:17px;margin-top:8px}
-.stage.tall .now{min-height:88px}
-.stage.tall .now .what{font-size:40px}
-.stage.tall .now .where{font-size:25px}
-.stage.tall .yr{grid-template-columns:165px 1fr 185px;gap:16px;padding:5px 0}
-.stage.tall .yr .nm{font-size:36px}
-.stage.tall .yr .nm i{height:40px}
-.stage.tall .yr .st{font-size:28px}
-.stage.tall .yr .nx{font-size:20px}
-.stage.tall .yr .nx b{font-size:28px}
-.stage.tall .yr.mk .nm{font-size:28px}
-.stage.tall .crew{font-size:20px}
-.stage.tall .foot{font-size:15px}
+.stage.tall .panel{left:0;width:780px;padding:14px 24px 10px;gap:8px}
+.stage.tall .head{padding-bottom:8px;border-bottom-width:1px;align-items:center}
+.stage.tall .head .kicker{display:none}
+.stage.tall .head .t{gap:2px}
+.stage.tall .head h1{font-size:28px}
+.stage.tall .head .date{font-size:14px;letter-spacing:.06em}
+.stage.tall .clock{font-size:84px}
+.stage.tall .clock small{font-size:12px;margin-top:4px;letter-spacing:.2em}
+.stage.tall .now{min-height:0;gap:2px 12px}
+.stage.tall .now .tag{font-size:15px;padding:4px 8px}
+.stage.tall .now .what{font-size:25px}
+.stage.tall .now .where{font-size:15px}
+.stage.tall .yr{grid-template-columns:104px 1fr 112px;gap:10px;padding:3px 0}
+.stage.tall .yr .nm{font-size:23px;gap:8px}
+.stage.tall .yr .nm i{width:11px;height:24px}
+.stage.tall .yr .st{font-size:19px}
+.stage.tall .yr .nx{font-size:12px;line-height:1.15}
+.stage.tall .yr .nx b{font-size:18px}
+.stage.tall .yr.mk .nm{font-size:19px}
+.stage.tall .crew{font-size:13px;gap:2px 14px}
+.stage.tall .foot{font-size:10px}
 .stage.nocrew .crew .cm-c{display:none}
 .stage.nocar .crew .cm-d{display:none}
 @media (prefers-reduced-motion: reduce){.ripple{display:none}}
@@ -584,11 +588,11 @@ body{background:var(--page);color:var(--ink);font-family:var(--f-body);margin:0}
  </div>
 </div>
 
-<div class="ctrl">
+<div class="ctrl" id="ctrlbar">
  <button id="play" type="button">再生</button>
  <select id="speed" aria-label="再生の速さ"><option value="1">1秒＝1分</option><option value="3">1秒＝3分</option><option value="5" selected>1秒＝5分</option><option value="10">1秒＝10分</option></select>
  <div class="sl"><span>6:00</span><input id="t" type="range" min="360" max="1170" step="1" value="360" aria-label="時刻"><span>19:30</span></div>
- <button id="live" type="button">いまの時刻（当日用）</button>
+ <button id="live" type="button">いまの時刻<span class="lg">（当日用）</span></button>
  <select id="follow" aria-label="地図の範囲"><option value="">地図：全体</option><option>伊和</option><option>東市場</option><option>須行名</option><option>安黒</option><option>嶋田</option></select>
  <label><input id="crewon" type="checkbox" checked> カメラマン</label>
  <label><input id="caron" type="checkbox" checked> 車</label>
@@ -640,7 +644,7 @@ for(const k of YK){
          next:el('polyline',{fill:'none',stroke:D.col[k],'stroke-width':2.5,'stroke-opacity':.75,'stroke-dasharray':'2 7','stroke-linecap':'round','vector-effect':'non-scaling-stroke'},trails)};
 }
 // ---- 重ね（画面の座標で描くので、拡大しても文字は同じ大きさ） ----
-const gPlace=el('g',{},ov), gCrewPl=el('g',{},ov), gKura=el('g',{},ov), gRip=el('g',{},ov), gDot=el('g',{},ov), gCrew=el('g',{},ov), gY=el('g',{},ov), gDeco=el('g',{},ov);
+const gPlace=el('g',{},ov), gCrewPl=el('g',{},ov), gKura=el('g',{},ov), gRip=el('g',{},ov), gDot=el('g',{},ov), gY=el('g',{},ov), gCrew=el('g',{},ov), gDeco=el('g',{},ov);
 const placeEls=D.places.map(p=>{
   const g=el('g',{},p.name.startsWith('集合')?gCrewPl:gPlace);
   const big=p.name==='伊和神社'||p.name==='御旅所';
@@ -673,16 +677,14 @@ for(const k of YK){
 const mk=el('g',{},gY);el('path',{d:'M0,-12 L12,0 L0,12 L-12,0 Z',fill:'#D8B060',stroke:'#fff','stroke-width':3},mk);
 const mkT=el('text',{x:18,y:7,'font-size':20,'font-weight':900,fill:'#D8B060','paint-order':'stroke',stroke:'#0E1726','stroke-width':5,'font-family':'Zen Kaku Gothic New, sans-serif'},mk);mkT.textContent='神輿';
 // カメラマンと車
-const CAM='M-7,-4 h3 l2,-3 h4 l2,3 h3 v10 h-14 z';
-const CARP='M-9,2 l2,-6 h12 l3,6 v5 h-17 z';
+const CR=17, LET={'山内':'山','菊地':'菊','吉岡':'吉'};
 const C={};
 for(const k of CK){
   const g=el('g',{},gCrew);
-  const w=k==='吉岡'?92:84;
-  el('rect',{x:0,y:-16,width:w,height:32,rx:16,fill:'#F2EEE4',stroke:D.col[k],'stroke-width':3},g);
-  el('path',{d:k==='吉岡'?CARP:CAM,transform:'translate(18,1)',fill:D.col[k]},g);
-  const t=el('text',{x:34,y:8,'font-size':20,'font-weight':900,fill:D.col[k],'font-family':'Zen Kaku Gothic New, sans-serif'},g);t.textContent=k==='吉岡'?'吉岡':k;
-  C[k]={g,w};
+  const car=k==='吉岡';
+  el('circle',{r:CR,fill:car?'#3A4150':'#F2EEE4',stroke:car?'#F2EEE4':D.col[k],'stroke-width':3.5},g);
+  const t=el('text',{x:0,y:7,'text-anchor':'middle','font-size':20,'font-weight':900,fill:car?'#F2EEE4':D.col[k],'font-family':'Zen Kaku Gothic New, Hiragino Sans, sans-serif'},g);t.textContent=LET[k];
+  C[k]={g};
 }
 // ---- 右の一覧 ----
 const list=$('list'), rows={};
@@ -742,13 +744,13 @@ function draw(){
   gCrew.setAttribute('visibility','visible');gCrewPl.setAttribute('visibility',crewOn||carOn?'visible':'hidden');
   const cp={};for(const k of CK){const p=at(k,T);cp[k]=p?S(p):null}
   const yo=cp['吉岡'];
-  const carW=C['吉岡'].w;
+  const D2=CR*2+3;
   for(const k of CK){
     const o=C[k];const s=cp[k];const on=k==='吉岡'?carOn:crewOn;if(!s||!on){o.g.setAttribute('visibility','hidden');continue}o.g.setAttribute('visibility','visible');
     let x,y;
-    if(k==='吉岡'){x=s[0]-carW-14;y=s[1]+(ride?30:66)}
-    else if(ride.includes(k[0])&&yo){x=yo[0]-14+4+ride.indexOf(k[0])*(o.w+4);y=yo[1]+30}   // 車の札のすぐ右
-    else {x=s[0]-o.w-14;y=s[1]+(k==='山内'?-30:30)}
+    if(k==='吉岡'){x=s[0]-30;y=s[1]+(ride?34:64)}
+    else if(ride.includes(k[0])&&yo){x=yo[0]-30+D2*(1+ride.indexOf(k[0]));y=yo[1]+34}   // 車に乗っているときは「吉」のすぐ右に並べる
+    else {x=s[0]-30;y=s[1]+(k==='山内'?-30:30)}
     o.g.setAttribute('transform',`translate(${x},${y})`);
   }
   // 右の一覧
@@ -769,18 +771,29 @@ function draw(){
 }
 // ---- 画面の大きさ ----
 const vp=$('vp'),stage=$('stage');
-function setTall(v){
-  tall=v;vp.classList.toggle('tall',v);stage.classList.toggle('tall',v);
-  W=v?1080:700;H=v?1120:1080;AR=W/H;FULL=v?FULL_T:FULL_W;vb={...FULL};
-  ov.setAttribute('viewBox',`0 0 ${W} ${H}`);north.setAttribute('transform',`translate(${W-60},60)`);scale.setAttribute('transform',`translate(36,${H-44})`);
+const mapbox=document.querySelector('.mapbox'), panel=document.querySelector('.panel'), ctrl=$('ctrlbar');
+const MSW=780, PH=470;   // スマホ：画面の幅（設計上の大きさ）と、下の一覧の高さ
+let curSH=0;
+function setTall(v,SH){
+  tall=v;curSH=SH;vp.classList.toggle('tall',v);stage.classList.toggle('tall',v);
+  if(v){W=MSW;H=SH-PH;stage.style.width=MSW+'px';stage.style.height=SH+'px';mapbox.style.width=MSW+'px';mapbox.style.height=H+'px';panel.style.top=H+'px';panel.style.height=PH+'px'}
+  else{W=700;H=1080;for(const e of [stage,mapbox,panel]){e.style.width='';e.style.height=''}panel.style.top=''}
+  AR=W/H;FULL=v?{cx:142,cy:240,h:Math.max(445,215/AR)}:FULL_W;vb={...target(T)};
+  ov.setAttribute('viewBox',`0 0 ${W} ${H}`);north.setAttribute('transform',`translate(${W-46},56)`);scale.setAttribute('transform',`translate(28,${H-30})`);
 }
 function fit(){
   const want=!document.fullscreenElement&&vp.parentElement.clientWidth<700;
-  if(want!==tall)setTall(want);
-  const SW=tall?1080:1920,SH=tall?1920:1080;
-  const r=vp.getBoundingClientRect();const s=Math.min(r.width/SW,r.height/SH);
-  stage.style.transform=`translate(${(r.width-SW*s)/2}px,${(r.height-SH*s)/2}px) scale(${s})`}
-new ResizeObserver(fit).observe(vp);fit();
+  document.body.classList.toggle('m',want);
+  const hh=want?Math.max(320,Math.round(window.innerHeight-ctrl.offsetHeight-($('err').hidden?0:$('err').offsetHeight)))+'px':'';
+  if(vp.style.height!==hh)vp.style.height=hh;
+  const r=vp.getBoundingClientRect();
+  const SH=want?Math.round(MSW*r.height/r.width):1080;
+  if(want!==tall||(want&&SH!==curSH))setTall(want,SH);
+  const SW=tall?MSW:1920,SHH=tall?SH:1080;
+  const s=Math.min(r.width/SW,r.height/SHH);
+  stage.style.transform=`translate(${(r.width-SW*s)/2}px,${(r.height-SHH*s)/2}px) scale(${s})`}
+window.addEventListener('resize',fit);
+let fitQ=false;new ResizeObserver(()=>{if(fitQ)return;fitQ=true;setTimeout(()=>{fitQ=false;fit()},0)}).observe(vp);fit();
 // ---- 再生 ----
 let playing=false,live=false,last=performance.now();
 function loop(now){const dt=(now-last)/1000;last=now;
